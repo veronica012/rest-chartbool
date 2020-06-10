@@ -1,17 +1,26 @@
 $(document).ready(function(){
-
 //chiamata ajax
     $.ajax({
 
-        'url': 'http://157.230.17.132:4005/sales' ,
+        'url': 'http://157.230.17.132:4005/sales',
         'method': 'GET',
-        'success': function(data) {
-//recuperare l'array che contiene gli oggetti
-            var array_sales = data.;
-            console.log(array);
-//recuperare ogni singolo oggetto
-            for (var i = 0; i < array_sales.length; i++ ) {
-                
+        'success': function(array) {
+//data contiene l'array, quindi ciclo for su data per recupere ogni singolo oggetto contenuto in array
+            for (var i = 0; i < array.length; i++) {
+                var oggetto_corrente = array[i];
+                console.log(oggetto_corrente);
+//recupero il valore delle vendite
+                var amount = oggetto_corrente.amount;
+                console.log(amount);
+//recupero data
+                var date = (oggetto_corrente.date);
+                console.log(date);
+//recupero il mese
+                var mese = moment(date, "DD/MM/YY");
+                console.log(mese.format('MM'));
+//recupero il ome del venditore
+                var salesman = oggetto_corrente.salesman;
+                console.log(salesman);
             }
 
 
