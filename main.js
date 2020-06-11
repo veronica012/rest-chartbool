@@ -2,6 +2,7 @@ $(document).ready(function(){
 //conversione moment
 moment.locale('it');
 var url = 'http://157.230.17.132:4005/sales/';
+var grafici = {};
 //chiamata ajax
     $.ajax({
         'url': url ,
@@ -12,12 +13,13 @@ var url = 'http://157.230.17.132:4005/sales/';
             var chiavi = Object.keys(dati_vendite_totali);
             var valori = Object.values(dati_vendite_totali);
     //chiamo la funzione che disegna il grafico
-            disegnaGrafico_vendite_mensili(chiavi, valori);
+            grafici.mylineChart = disegnaGrafico_vendite_mensili(chiavi, valori);
+
     //chiamo la funzione che gestisce i dati delle vendite ripartite per venditore
             var dati_vendite_venditori = gestisciDati_venditori(array);
             var nome = Object.keys(dati_vendite_venditori);
             var importo = Object.values(dati_vendite_venditori);
-            disegnaGrafico_vendite_venditori(nome, importo);
+            grafici.mypieChart = disegnaGrafico_vendite_venditori(nome, importo);
         },
         'error': function() {
             alert('Impossibile raggiungere il sito')
@@ -26,21 +28,45 @@ var url = 'http://157.230.17.132:4005/sales/';
     //intercetto il click
     $('button').click(function(){
         //inizio chiamata post
+        var nome_selezionato = $('.nomi').val();
+            console.log(nome_selezionato);
+        var mese_selezionato =$('.mesi').val();
+        mese_selezionato = moment(mese_selezionato, "MMM").format("01/MM/2017");
+        console.log(mese_selezionato);
+        var importo_inserito = parseInt($('.inserisci_importo').val());
+            console.log(importo_inserito);
+            var nuovo_oggetto = {
+                'salesman': nome_selezionato,
+                'amount': importo_inserito,
+                'date': mese_selezionato
+            }
+
         $.ajax({
             'url': url,
             'method': 'POST',
-            'success': function() {
-                var nome_selezionato = $('.nomi').val();
-                    console.log(nome_selezionato);
-                var mese_selezionato =$('.mesi').val();
-                    console.log(mese_selezionato);
-                var importo_inserito = $('input').val();
-                    console.log(importo_inserito);
+            'data': nuovo_oggetto,
+            'success': function(nuovi_dati) {
+                console.log(nuovo_oggetto);
+                // window.location.reload();
             },
             'error': function() {
                 alert('Impossibile raggiungere il sito')
             }
         }); //fine chiamata post
+
+        // $.ajax({
+        //     'url': url ,
+        //     'method': 'GET',
+        //     'success': function(nuovi_dati){
+        //         console.log(nuovi_dati)
+        //
+        //
+        //     },
+        //     'error': function() {
+        //         alert('Impossibile raggiungere il sito');
+        //     }
+        //
+        // });
 
     }); //fine click
 
@@ -84,11 +110,10 @@ var url = 'http://157.230.17.132:4005/sales/';
 //fine funzione
 
 //funzione che crea il grafico
-
 function disegnaGrafico_vendite_mensili (etichette, dati) {
 
 //chart line
-    var ctx = $('#myChart-line')[0].getContext('2d');
+    var ctx = $('#mylineChart')[0].getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -119,7 +144,9 @@ function disegnaGrafico_vendite_mensili (etichette, dati) {
             }
         }
     });
+    return myChart;
 }
+
 //fine funzione
 //FUNZIONI GRAFICO PIE VENDITE PER VENDITORE
 function gestisciDati_venditori(data) {
@@ -156,7 +183,7 @@ return oggetto_venditori
 
 function disegnaGrafico_vendite_venditori(etichette, dati) {
     //chart pie
-    var ctx = $('#myChart-pie')[0].getContext('2d');
+    var ctx = $('#mypieChart')[0].getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'pie',
         data: {
