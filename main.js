@@ -18,14 +18,31 @@ var url = 'http://157.230.17.132:4005/sales/';
             var nome = Object.keys(dati_vendite_venditori);
             var importo = Object.values(dati_vendite_venditori);
             disegnaGrafico_vendite_venditori(nome, importo);
-
-
-
         },
         'error': function() {
             alert('Impossibile raggiungere il sito')
         }
-    });
+    }); //fine chiamata get
+    //intercetto il click
+    $('button').click(function(){
+        //inizio chiamata post
+        $.ajax({
+            'url': url,
+            'method': 'POST',
+            'success': function() {
+                var nome_selezionato = $('.nomi').val();
+                    console.log(nome_selezionato);
+                var mese_selezionato =$('.mesi').val();
+                    console.log(mese_selezionato);
+                var importo_inserito = $('input').val();
+                    console.log(importo_inserito);
+            },
+            'error': function() {
+                alert('Impossibile raggiungere il sito')
+            }
+        }); //fine chiamata post
+
+    }); //fine click
 
 //FUNZIONI
 //funzione che gestisce i dati resituiti dall'api
