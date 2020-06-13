@@ -1,30 +1,10 @@
 $(document).ready(function(){
 //conversione moment
 moment.locale('it');
-var url = 'http://157.230.17.132:4005/sales/';
-var grafici = {};
-//chiamata ajax
-    $.ajax({
-        'url': url ,
-        'method': 'GET',
-        'success': function(array) {
-    //chiamo la funzione che gestisce i dati e somma le vendite totali di ogni mese
-            var dati_vendite_totali = gestisciDati_mensili(array);
-            var chiavi = Object.keys(dati_vendite_totali);
-            var valori = Object.values(dati_vendite_totali);
-    //chiamo la funzione che disegna il grafico
-            grafici.mylineChart = disegnaGrafico_vendite_mensili(chiavi, valori);
+var url = 'http://157.230.17.132:4005/sales';
+//chiamo la funzione disegna grafici che crea fa la chiamata ajax e disegna i grafici
+    disegnaGrafici();
 
-    //chiamo la funzione che gestisce i dati delle vendite ripartite per venditore
-            var dati_vendite_venditori = gestisciDati_venditori(array);
-            var nome = Object.keys(dati_vendite_venditori);
-            var importo = Object.values(dati_vendite_venditori);
-            grafici.mypieChart = disegnaGrafico_vendite_venditori(nome, importo);
-        },
-        'error': function() {
-            alert('Impossibile raggiungere il sito')
-        }
-    }); //fine chiamata get
     //intercetto il click
     $('button').click(function(){
         //inizio chiamata post
@@ -41,32 +21,26 @@ var grafici = {};
                 'date': mese_selezionato
             }
 
+//chiamata post
+    if (nome_selezionato != '' && importo_inserito != '' && mese_selezionato != '') {
         $.ajax({
             'url': url,
             'method': 'POST',
             'data': nuovo_oggetto,
             'success': function(nuovi_dati) {
                 console.log(nuovo_oggetto);
-                // window.location.reload();
+                disegnaGrafici();
+
             },
             'error': function() {
                 alert('Impossibile raggiungere il sito')
             }
         }); //fine chiamata post
-
-        // $.ajax({
-        //     'url': url ,
-        //     'method': 'GET',
-        //     'success': function(nuovi_dati){
-        //         console.log(nuovi_dati)
-        //
-        //
-        //     },
-        //     'error': function() {
-        //         alert('Impossibile raggiungere il sito');
-        //     }
-        //
-        // });
+    } else if (nome_selezionato == '') {
+        alert('Seleziona un nome');
+    } else  if (importo_inserito == '') {
+        alert('Seleziona un importo valido');
+    }
 
     }); //fine click
 
@@ -125,7 +99,7 @@ function disegnaGrafico_vendite_mensili (etichette, dati) {
                     'rgba(255, 99, 132, 0.2)',
 
                 borderColor:
-                    'rgba(255, 99, 132, 1)',
+                    'rgba(75, 192, 192, 0.2)',
 
                 borderWidth: 1
             }]
@@ -224,5 +198,29 @@ function disegnaGrafico_vendite_venditori(etichette, dati) {
             }
         }
     });
+}
+//questa funzione fa la chiamata ajax, chiamata in post aggiorna il grafico
+function disegnaGrafici() {
+    $.ajax({
+        'url': url ,
+        'method': 'GET',
+        'success': function(array) {
+    //chiamo la funzione che gestisce i dati e somma le vendite totali di ogni mese
+            var dati_vendite_totali = gestisciDati_mensili(array);
+            var chiavi = Object.keys(dati_vendite_totali);
+            var valori = Object.values(dati_vendite_totali);
+    //chiamo la funzione che disegna il grafico
+            disegnaGrafico_vendite_mensili(chiavi, valori);
+
+    //chiamo la funzione che gestisce i dati delle vendite ripartite per venditore
+            var dati_vendite_venditori = gestisciDati_venditori(array);
+            var nome = Object.keys(dati_vendite_venditori);
+            var importo = Object.values(dati_vendite_venditori);
+            disegnaGrafico_vendite_venditori(nome, importo);
+        },
+        'error': function() {
+            alert('Impossibile raggiungere il sito')
+        }
+    }); //fine chiamata get
 }
 });
